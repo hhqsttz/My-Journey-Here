@@ -1,0 +1,18 @@
+[
+    {
+        "name": "n",
+        "gender": "n",
+        "age": 1,
+        "mobile_number": 1,
+        "is_leave": false,
+        "leave": "在职"
+    },
+    {
+        "name": "m",
+        "gender": "m",
+        "age": 1,
+        "mobile_number": 1,
+        "is_leave": true,
+        "leave": "离职"
+    }
+]
