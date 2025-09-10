@@ -1,80 +1,27 @@
 import json
 import os
-
 import sys
-
 from employee import Employee
 
 
 class EmployeeManagerSystem(object):
+    #创建单例类
+    _instance = None
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls,"_instance"):
+            cls._instance = super(EmployeeManagerSystem,cls).__new__(cls)
+        return cls._instance
 
+    #初始化
     def __init__(self):
         self.employees_file = "employees.json"
         self.employees_backup_file = "employees_backup.json"
-
         self.load_employee_from_file()
 
     def main(self):
         """员工管理系统入口"""
-
         while True:
             self.show()
-
-    def load_employee_from_file(self):
-
-        #
-        # 读取员工文件，并且放到一个列表当中
-        # :return:
-        #文件是否存在
-        if not os.path.exists(self.employees_file):
-            self.employee_list = []
-            return
-        try:
-            f = open(self.employees_file, "r", encoding="utf-8")
-            content = f.read().strip()
-            self.employee_list = []
-            if not content:
-                return
-            a = json.loads(content)
-            for dict in a:
-                self.employee_list.append(Employee(dict["name"], dict['gender'], dict['age'], dict['mobile_number']))
-        except Exception as e:
-            print(f"加载文件时出错: {e}")
-            self.employee_list = []
-
-
-    # def load_employee_from_file(self):
-    #     """
-    #     读取员工文件，并且放到一个列表当中
-    #     """
-    #     if not os.path.exists(self.employees_file):
-    #         # 如果文件不存在，直接返回
-    #         return
-    #
-    #     try:
-    #         with open(self.employees_file, "r", encoding='utf-8') as f:
-    #             content = f.read().strip()
-    #             if not content:  # 文件为空
-    #                 return
-    #
-    #             # 将JSON字符串解析为Python列表
-    #             employees_data = json.loads(content)
-    #
-    #             for emp_data in employees_data:
-    #                 # 创建Employee对象
-    #                 emp = Employee(
-    #                     emp_data["name"],
-    #                     emp_data['gender'],
-    #                     emp_data['age'],
-    #                     emp_data['mobile_number'],
-    #                     emp_data.get('is_leave', False)  # 使用get方法提供默认值
-    #                 )
-    #                 self.employee_list.append(emp)
-    #
-    #     except json.JSONDecodeError as e:
-    #         print(f"JSON解析错误: {e}")
-    #     except Exception as e:
-    #         print(f"加载文件时出错: {e}")
     # 返回到界面窗口
     @staticmethod
     def stop():
@@ -191,14 +138,64 @@ class EmployeeManagerSystem(object):
             for emp in self.employee_list:
                 new_list.append(vars(emp))
             json.dump(new_list,f, ensure_ascii=False,indent=4)
+    #拿取文件对象数据
+    def load_employee_from_file(self):
 
-
-
-
-
-
+        #
+        # 读取员工文件，并且放到一个列表当中
+        # :return:
+        #文件是否存在
+        if not os.path.exists(self.employees_file):
+            self.employee_list = []
+            return
+        try:
+            f = open(self.employees_file, "r", encoding="utf-8")
+            content = f.read().strip()
+            self.employee_list = []
+            if not content:
+                return
+            a = json.loads(content)
+            for dict in a:
+                self.employee_list.append(Employee(dict["name"], dict['gender'], dict['age'], dict['mobile_number']))
+        except Exception as e:
+            print(f"加载文件时出错: {e}")
+            self.employee_list = []
 if __name__ == '__main__':
     mm = EmployeeManagerSystem()
     mm.main()
+
+
+"""
+案例思路：
+1.实现单例类
+
+2.从文件中获取对象信息，最终返回一个列表
+先判断文件存在不，再判断文件中有没有数据，最后都要返回一个列表用来接下来对数据对象的存储
+
+3.使用match函数来匹配业务
+
+4.增删改查操作
+
+5.文件的保存与跟新
+
+
+案例重要内容
+1.实现单例类
+2.掌握了文件与json的操作
+将对象字典化 vars(py)
+
+json文件数据与python对象的转化
+    json数据->py 
+        1.文件 json.load(f) 
+        2.json字符串 json.loads(json字符串)
+    py -> json数据
+        1.文件 json.dump(py,f,ensure_ascii=False,indent=4)
+        2.字符串 json.dumps(py,ensure_ascii=False,indent=4)
+3.输入bool数值可以直接与"true"来进行匹配
+
+"""
+
+
+
 
 
