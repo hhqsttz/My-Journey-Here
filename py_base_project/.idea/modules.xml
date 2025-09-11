@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/py_base_project.iml" filepath="$PROJECT_DIR$/.idea/py_base_project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../py_gradio_practice/.idea/py_gradio_practice.iml" filepath="$PROJECT_DIR$/../py_gradio_practice/.idea/py_gradio_practice.iml" />
     </modules>
   </component>
 </project>
