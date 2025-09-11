@@ -1,0 +1,103 @@
+1.常用属性：
+    info：类似describe
+    label：标签
+    value：“默认值”
+2.组件：
+滑动轨 Slider(起始值，终止值，value=“默认值”)
+可多选下拉框 Dropdown([参数]，value，multiselect=true)
+单选按钮 radio([参数]，value)
+复选框     checkbox([参数]，value) True/False
+0/1/多个   checkboxGrop()         返回列表
+title： “标题”
+description：“总体的描述”
+example：[对应函数的输入数据列表] 一般放在最下面来提供实例
+article：“文章描述” 在例子的下面
+3.接口：
+gr.Interface(fn,intput,output) 基础的interface
+
+gr.TabbedInterface(            实现了一个界面多个接口
+    Interface_list=[接口一，接口二，...]
+    Interface_name=["接口一标题"，"接口二标题"]
+    )
+
+def echo(message,history，..附加输入)
+
+    流式响应输出
+    for i in res
+        time.sleep(0.1) 模拟响应
+    yield res[:i+1]
+
+
+gr.ChatInterface(             对话接口
+    fn=echo                   指定函数
+    type="messages"           指定传进来的history的格式{"role":"user/assistant","content":""}
+    autofocus=True            让光标每次输出完就放在文本框中
+    #如果为多模态聊天接口需要以下操作
+    multimodel=True           此时message变为了一个字典{"Text":"","files":"单个文件路径"/["",""]（多个文件列表）}
+    additional_intput=[]      允许加入额外的组件，记得也要在函数添加对应的参数
+)
+4.block组件，低阶组件，可以自定义布局
+
+    1.基础组件
+    with gr.Blocks as demo
+        a1=gr.Textbox(label="标签")   文本框
+        a2=gr.Button()               按钮
+        a2.click(                    按钮绑定事件
+            fn=
+            intput=
+            output=
+        )
+    2.布局组件
+    gr.Row 将组件水平排列在同一行
+    gr.Column 将组件垂直排在同一列
+    gr.Group  将组件组成一个组
+    gr.Tab    将组件分成不同的卡片组
+    gr.Accordion    将组件页面折叠起来
+    with gr.Blocks as demo
+        with gr.Accordion(open=false)    一般默认关闭
+            with gr.Tab("a1")
+                with gr.Group
+                    with gr.row()
+                        gr.Tex()
+                        gr.Tex()
+                        gr.Tex()
+                        with ge.Column
+                        gr.Tex()
+                        gr.Tex()
+            with gr.Tab("a2")
+                with gr.Group
+                    with gr.row()
+                        gr.Tex()
+                        gr.Tex()
+                        gr.Tex()
+                        with ge.Column
+                        gr.Tex()
+                        gr.Tex()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
