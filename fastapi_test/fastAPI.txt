@@ -1,0 +1,131 @@
+fastAPI
+1.创建一个虚拟环境
+2.以虚拟环境作为python解释器
+3.创建一个项目，并且在这个项目中导入fast api
+4.创建一个实例 app=FASTAPI()
+5.创建以APP实例为装饰器的路径函数
+6.请求方法有这四种get post put delete 
+7.在参数中写入你的路径
+路径从上到下进行执行,要注意顺序
+8.其中可以一下面三种方式传参
+传入的参数的数据类型可以是这几类：
+基础数据类型str,数字类型,容器类型等
+以类的类型，包括枚举类
+1.路径参数 
+  eg: /abc/{a}  
+  如果传入的是一个路径参数,可以{a:path}表示，传入的路径需要在最前面加/，
+比如/abc//a/b/c
+2.查询参数
+  不用在路径里面写,在函数()里面写就行,可以以这个方式a:数据类型=Query(),Query这类里面有几个参数：
+default =
+description =
+字符串类型可接的参数：
+长度大小
+max_length =
+min_length =
+正则表达式
+regex =
+数值类型可接的参数：
+gt=  大于
+ge= 大于等于
+lt= 小于
+le= 小于等于
+3.请求体传参
+pytandic对象
+class 类名（basemodel）:
+变量：数据类型 = field（和query参数一样）
+函数：
+@field_validator("name") #校验name字段def name_must_alpha(cls, value):
+  assert value.isalpha(), 'name must be alpha'
+ # 断⾔语句,检查value是否全部由字⺟组成,如果value的值不满⾜条件则引发AssertionEr
+ # 并且异常错误消息是:"name must be alpha"
+return value
+你总结得非常棒，整体理解已经很清楚了，我帮你梳理一下，并给出一些补充和修正，让逻辑更准确、更规范：
+---
+1️⃣ 虚拟环境和项目
+你的步骤 1~3 基本正确：
+1. 创建虚拟环境
+python -m venv venv
+2. 使用虚拟环境作为 Python 解释器（IDE 里设置，或者在终端激活）
+# Windows
+venv\Scripts\activate
+# Linux / Mac
+source venv/bin/activate
+3. 创建项目并安装 FastAPI
+pip install fastapi uvicorn
+✅ 没问题。
+---
+2️⃣ 创建实例与路由
+4. 创建 FastAPI 实例
+from fastapi import FastAPI
+app = FastAPI()
+5. 创建路径函数（以 app 实例为装饰器）
+@app.get("/hello")
+async def hello():
+    return {"msg": "Hello World"}
+6. 请求方法：GET、POST、PUT、DELETE
+✅ 正确。
+7. 路径顺序：
+FastAPI 会按路由匹配优先级执行，但路径参数越具体优先级越高，然后是带有参数的路径，最后是通配路径（例如 /abc/{param}）。
+你的“从上到下执行”表述不完全准确，路由匹配是按具体程度和路径匹配规则，不是简单的定义顺序。
+---
+3️⃣ 参数传递方式
+你列的三种方式基本正确，我帮你细化：
+(1) 路径参数 Path Parameter
+from fastapi import Path
+@app.get("/abc/{a}")
+async def read_item(a: str = Path(..., description="路径参数")):
+    return {"a": a}
+{a:path} 表示可以匹配 多层路径
+/abc//a/b/c
+路径参数必须在 URL 中写，且通常在路由最前面。
+---
+(2) 查询参数 Query Parameter
+from fastapi import Query
+@app.get("/items/")
+async def read_items(
+    q: str = Query(default=None, max_length=10, description="查询字符串"),
+    n: int = Query(default=0, gt=0, le=100, description="数字查询")
+):
+    return {"q": q, "n": n}
+字符串类型可设置：max_length, min_length, regex
+数值类型可设置：gt, ge, lt, le
+不用写在路径里，直接写在函数参数里即可。
+---
+(3) 请求体传参（Request Body）
+用 Pydantic 模型
+from pydantic import BaseModel, Field, field_validator
+class User(BaseModel):
+    name: str = Field(..., description="用户名")
+    age: int = Field(..., gt=0, le=150)
+    @field_validator("name")
+    def name_must_alpha(cls, value):
+        assert value.isalpha(), "name must be alpha"
+        return value
+@app.post("/users/")
+async def create_user(user: User):
+    return {"user": user.dict()}
+✅ 核心点：
+BaseModel 定义数据结构
+Field 用于额外校验和描述
+@field_validator 用于自定义校验
+请求体 JSON 自动解析成 Pydantic 对象
+---
+4️⃣ 小修正 / 补充
+1. 路径顺序执行 → 应理解为 路由匹配优先级，不是字面顺序。
+2. 查询参数和请求体混合时，POST/PUT 推荐用请求体传复杂对象，GET/DELETE 用查询参数。
+3. 枚举类型也可以作为路径参数或请求体字段：
+from enum import Enum
+class Color(str, Enum):
+    red = "red"
+    green = "green"
+@app.get("/color/{c}")
+async def get_color(c: Color):
+    return {"color": c}
+---
+总结：
+你的总结整体正确，尤其是三种传参方式和 Pydantic 验证思路都对。
+路径顺序那一条要稍微修正为 路由匹配优先级。
+其他基本完全可以照你写的步骤实践 FastAPI。
+---
+

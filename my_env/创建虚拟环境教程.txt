@@ -1,0 +1,15 @@
+1.在特定的python版本下下载virtualenv 
+	直接调用绝对路径下载 E:\python3\Scripts\pip.exe install virtualenv
+
+2.在命令行打开你想创建虚拟环境的根目录
+
+	D:\biancheng1\python\my_project\my_env>
+
+3.在后面输入你的特定版本python解释器下的虚拟环境启动器
+
+	D:\biancheng1\python\my_project\my_env>E:\python3\Scripts\virtualenv my_env(你想取得虚拟环境目录名)
+4.这就创建好了，进入虚拟环境，将所需要的包导入
+
+	D:\biancheng1\python\my_project\my_env\Fastapi_env\Scripts\activate
+
+	(Fastapi_env) D:\biancheng1\python\my_project\my_env\Fastapi_env\Scripts>pip install   ....

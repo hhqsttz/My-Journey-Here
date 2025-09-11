@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../Fastapi_test/.idea/Fastapi_test.iml" filepath="$PROJECT_DIR$/../Fastapi_test/.idea/Fastapi_test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/py_base_project.iml" filepath="$PROJECT_DIR$/.idea/py_base_project.iml" />
       <module fileurl="file://$PROJECT_DIR$/../py_gradio_practice/.idea/py_gradio_practice.iml" filepath="$PROJECT_DIR$/../py_gradio_practice/.idea/py_gradio_practice.iml" />
     </modules>

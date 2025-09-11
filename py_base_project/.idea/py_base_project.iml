@@ -7,5 +7,6 @@
     <orderEntry type="jdk" jdkName="Python 3.13 (py_base_project)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="py_gradio_practice" />
+    <orderEntry type="module" module-name="Fastapi_test" />
   </component>
 </module>
