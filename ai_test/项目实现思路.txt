@@ -1,0 +1,46 @@
+大模型项目
+一.第一步，下载模型
+from （huggingface_hub/modelscope） import snapshot_download
+# ==== 配置区域 ====
+# Hugging Face 模型仓库 ID (在模型页面 URL 可以找到)
+repo_id = "Qwen/Qwen2.5-Omni-3B"
+# 模型下载保存目录 (可以换成自己的路径)
+cache_dir = "/root/autodl-tmp/models"
+# 指定版本 (huggingface是 "main"，modelscope是"master")
+revision = "main"/"master"
+# =================
+# 下载整个仓库
+model_dir = snapshot_download(
+    repo_id=repo_id,
+    cache_dir=cache_dir,
+    revision=revision
+)
+print(f"✅ 模型已完整下载到: {model_dir}")
+二.通过部署框架部署
+以vllm为例
+-- deepseek-r1-0528-qwen3-8B
+  python -m vllm.entrypoints.openai.api_server \
+  --model /root/autodl-tmp/models/deepseek-ai/DeepSeek-R1-0528-Qwen3-8B \
+  --served-model-name ds-qwen3-8b \
+  --max-model-len 8k \
+  --host 0.0.0.0 \
+  --port 6006 \
+  --dtype bfloat16 \
+  --gpu-memory-utilization 0.8 \
+  --enable-auto-tool-choice \
+  --tool-call-parser hermes
+通用
+python -m vllm.entrypoints.openai.api_server \
+  --model 本地模型路径\
+  --served-model-name 模型名字\
+  --max-model-len 上下文长度 \
+  --host 0.0.0.0 \
+  --port 6006 \
+  --dtype bfloat16 \
+  --gpu-memory-utilization 0.8 \
+  --enable-auto-tool-choice \
+  --tool-call-parser hermes
+三.项目创建
+1.多模态ai智能助手
+ 大模型实例创建模块
+ .env来存大模型的api_key和base_url通过env_test.py将env导入到设置的变量中，llm_model.py来创建llm
