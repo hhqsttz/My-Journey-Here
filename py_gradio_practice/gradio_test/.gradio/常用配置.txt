@@ -1,3 +1,6 @@
+启动方式：
+冷启动：python app.py
+热启动：gradio app.py (此时的接口应该改名为demo)此方式代码改动，界面也随之而动
 1.常用属性：
     info：类似describe
     label：标签

@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d1bc9e66-e34e-4274-bfbb-a3ee65eaf4d0" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gradio_test/.gradio/常用配置.txt" beforeDir="false" afterPath="$PROJECT_DIR$/gradio_test/.gradio/常用配置.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -16,21 +15,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "hhqsttz"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;hhqsttz&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/hhqsttz/My-Journey-Here.git",
-    "accountId": "1e876b6f-8a41-46df-bfde-b17d51d69790"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/hhqsttz/My-Journey-Here.git&quot;,
+    &quot;accountId&quot;: &quot;1e876b6f-8a41-46df-bfde-b17d51d69790&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="32a3LE4nZZtmA3tbDnMtecckqx5" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -40,6 +39,7 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "D:/biancheng1/python/my_project/py_gradio_practice",
     "node.js.detected.package.eslint": "true",
@@ -68,6 +68,7 @@
       <updated>1754050817664</updated>
       <workItem from="1754050825355" duration="18000" />
       <workItem from="1757644798900" duration="5617000" />
+      <workItem from="1757652753352" duration="570000" />
     </task>
     <servers />
   </component>
