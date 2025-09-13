@@ -1,5 +1,5 @@
 from langchain_openai import ChatOpenAI
-from llm_instance_creation.env_test import OPENAI_BASE_URL, OPENAI_API_KEY, BASE_URL, BASE_API_KEY
+from env_test import OPENAI_BASE_URL, OPENAI_API_KEY, BASE_URL, BASE_API_KEY
 
 llm= ChatOpenAI(
     base_url=OPENAI_BASE_URL,

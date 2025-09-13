@@ -4,6 +4,5 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="Python 3.13 virtualenv at D:\biancheng1\python\my_project\my_env\ai_evn" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="py_gradio_practice" />
   </component>
 </module>

@@ -14,9 +14,9 @@ def f1 (chat_history,user_message):
     return chat_history,""
 def f2 (chat_history):
     chat_history.append({"role": "assistant", "content": ""})
-
+    user_id=""
     # 遍历 stream() 生成器
-    for token in final_chain1.stream(chat_history[-1]["content"]):
+    for token in final_chain1.stream(chat_history[-1]["content"],config={"configrualbe":{"session_id":user_id}}):
         chat_history[-1]["content"] += token  # 每个 token 更新 AI 消息
         yield chat_history
 

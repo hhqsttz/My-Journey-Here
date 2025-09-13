@@ -1,5 +1,26 @@
 大模型项目
+要导的包
+模型库：
+huggingface_hub
+modelscope
+前端/后端框架:
+gradio
+fastapi
+模型实例创建相关：
+openai
+langchain_openai
+langchain_huggingface
+langchain框架：
+langchain
+langchain-community
+transform推理框架：
+stances—transform
+
+
 一.第一步，下载模型
+ pip install -U huggingface_hub
+ 配置环境变量
+ HF_ENDPOINT = https://hf_mirror.com
 from （huggingface_hub/modelscope） import snapshot_download
 # ==== 配置区域 ====
 # Hugging Face 模型仓库 ID (在模型页面 URL 可以找到)
