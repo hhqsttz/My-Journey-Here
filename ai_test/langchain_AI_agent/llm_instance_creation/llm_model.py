@@ -5,11 +5,13 @@ llm= ChatOpenAI(
     base_url=OPENAI_BASE_URL,
     api_key=OPENAI_API_KEY,
     model="llm.name",
-    temperature=0.8
+    temperature=0.8,
+    streaming=True #流式输出
 )
 LOCAL_llm= ChatOpenAI(
     base_url=BASE_URL,
     api_key=BASE_API_KEY,
     model="LOCAL_llm.name",
-    temperature=0.8
+    temperature=0.8,
+    streaming=True #流式输出
 )

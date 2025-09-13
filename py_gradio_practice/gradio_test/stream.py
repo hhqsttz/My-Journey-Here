@@ -1,7 +1,7 @@
 import time
 
 
-from fastapi import FastAPI
+
 import gradio as gr
 
 

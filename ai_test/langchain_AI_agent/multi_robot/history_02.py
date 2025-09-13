@@ -17,25 +17,32 @@ prompt3 = ChatPromptTemplate.from_messages([
 
 chain3 = prompt3 | llm
 
-# 保存历史聊天记录案例
+#保存历史聊天记录案例
+#案例需求：
+#1.保存所有的历史聊天记录到内存或数据库当中
+#2.如果历史聊天记录过长，保留最新的两条，剩下的做成摘要
 
 # 1.存入内存当中，进程结束就消失
-# store = {}用来存{"session_id":ChatMessageHistory对象}
-# ChatMessageHistory对象的核心属性
-# messages: list[BaseMessage] = Field(default_factory=list)
-# a = ChatMessageHistory()
-# 方法名	作用描述	参数说明
-# add_message(message)	添加一个 BaseMessage 对象到历史记录中。	message: 一个 BaseMessage 或其子类的实例。
-# add_user_message(message)	添加一条用户消息到历史记录中。	message: 字符串，用户消息的文本内容。
-# add_ai_message(message)	添加一条AI消息到历史记录中。	message: 字符串，AI消息的文本内容。
-# clear()	清空所有的聊天消息，将 messages 列表置空。	无参数。
-# a.messages=[BaseMessage]=[SystemMessage(content="内容"),AIMessage(content="内容"),HumanMessage(content="内容"),ToolMessage(content="内容")]
-# 消息对象有两种属性  a=SystemMessage(content="内容") a.type = "system",a.content="内容"
 store = {}
 def get_session_history1(session_id: str):
     if session_id not in store:
         store[session_id] = InMemoryChatMessageHistory()
     return store[session_id]
+# store = {}用来存{"session_id":ChatMessageHistory对象}
+
+# ChatMessageHistory对象的核心属性：
+# messages: list[BaseMessage] = Field(default_factory=list)
+# a = ChatMessageHistory()
+# a.messages=[BaseMessage]=[SystemMessage(content="内容"),AIMessage(content="内容"),HumanMessage(content="内容"),ToolMessage(content="内容")]
+# 消息对象有两种属性： a1=SystemMessage(content="内容") a1.type = "system",a1.content="内容"
+
+# ChatMessageHistory对象的核心方法：
+# 方法名	作用描述	参数说明
+# add_message(message)	添加一个 BaseMessage 对象到历史记录中。	message: 一个 BaseMessage 或其子类的实例。
+# add_user_message(message)	添加一条用户消息到历史记录中。	message: 字符串，用户消息的文本内容。
+# add_ai_message(message)	添加一条AI消息到历史记录中。	message: 字符串，AI消息的文本内容。
+# clear()	清空所有的聊天消息，将 messages 列表置空。	无参数。
+
 #2.存入关系型数据库
 def get_session_history2(session_id: str):
     return SQLChatMessageHistory(
@@ -46,29 +53,29 @@ def get_session_history2(session_id: str):
 def summarize_messages(current_input):
     session_id = current_input["config"]["configurable"]["session_id"]
     if not session_id :
-        return False
+        return []
     history = get_session_history1(session_id)
     if len(history.messages) <= 2 :
-        return False
-    chat_history =  history.messages[:-2]
-    summary_history = history.messages[-2:]
+        return history.messages
+    summary_history =  history.messages[:-2]
+    chat_history_last2 = history.messages[-2:]
     p =ChatPromptTemplate([
         ("system","请将下列历史消息总结成摘要，来进行用户回答"),
-        ("placeholder","{chat_history}"),
+        ("placeholder","{summary_history}"),
         ("human","请保留重要事实和决策")
     ])
 
     c = p | llm
-    history.clear()
-    history.add_message(c.invoke({"chat_history":chat_history}))
-    for i in summary_history:
-        history.add_message(i)
-    return True
-#4创建带有处理历史功能的链
+    history_list= [c.invoke({"summary_history": summary_history})]
+    for i in chat_history_last2:
+        history_list.append(i)
+    return history_list
+
+#4创建能够存储历史消息功能的链
 chain_with_history1 = RunnableWithMessageHistory(
     chain3,
     get_session_history1,
-    input_messages_key="intput",
+    input_messages_key="input",
     history_messages_key="chat_history"
 )
 chain_with_history2 = RunnableWithMessageHistory(
@@ -79,4 +86,34 @@ chain_with_history2 = RunnableWithMessageHistory(
 )
 
 res = chain_with_history1.invoke({"input": "你是谁？"},config = {"configurable": {"session_id": "你的会话ID"}})
+
+#5.最终的链，能够
+final_chain1 = (RunnableWithMessageHistory.assign(chat_history=summarize_messages)) | chain_with_history1
+final_chain2 = (RunnableWithMessageHistory.assign(chat_history=summarize_messages)) | chain_with_history2
+
+res1 = final_chain1.invoke({"input": "你是谁？","config" : {"configurable": {"session_id": "你的会话ID"}}},
+                          config = {"configurable": {"session_id": "你的会话ID"}})
+res2 = final_chain2.invoke({"input": "你是谁？","config" : {"configurable": {"session_id": "你的会话ID"}}},
+                          config = {"configurable": {"session_id": "你的会话ID"}})
+#RunnableWithMessageHistory()是一个管道传递runnable，传入的参数会原封不动的传到下一个Runnable，如果用assign函数，可以在输入内容再多加一个键，
+#(键名=函数名)，这样就会向下一个Runnable传一个{“键名”：函数返回值}的字典
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

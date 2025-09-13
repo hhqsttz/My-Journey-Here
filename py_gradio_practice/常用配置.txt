@@ -1,10 +1,69 @@
 启动方式：
 冷启动：python app.py
 热启动：gradio app.py (此时的接口应该改名为demo)此方式代码改动，界面也随之而动
-1.常用属性：
-    info：类似describe
-    label：标签
-    value：“默认值”
+1.组件常用属性：
+## 1️⃣ 通用属性（多数组件都支持）
+
+| 属性            | 说明                                      |
+| ------------- | --------------------------------------- |
+| `label`       | 组件的标题文字，显示在组件上方                         |
+| `visible`     | 是否显示组件，布尔值                              |
+| `interactive` | 是否允许用户交互，布尔值                            |
+| `value`       | 组件的初始值                                  |
+| `scale`       | 在 `Blocks` 布局中占的宽度比例（0-12）              |
+| `elem_id`     | 给组件设置 HTML 元素 id                        |
+| `every`       | 定时调用组件函数（少用）                            |
+| `info`        | 说明文字，显示在组件下方（部分组件支持，如 Textbox、Dropdown） |
+| `show_label`  | 是否显示 label，布尔值                          |
+
+---
+
+## 2️⃣ 输入类组件及特有属性
+
+| 组件         | 特有属性                  | 说明                                 |
+| ---------- | --------------------- | ---------------------------------- |
+| `Textbox`  | `placeholder`         | 占位提示文字                             |
+|            | `lines`               | 多行文本行数                             |
+|            | `max_lines`           | 最大行数                               |
+| `Dropdown` | `choices`             | 下拉选项列表                             |
+|            | `type`                | 返回值类型，可选 `str`, `index`, `value`   |
+| `Slider`   | `minimum` / `maximum` | 数值范围                               |
+|            | `step`                | 步长                                 |
+|            | `randomize`           | 是否随机初始值                            |
+| `Checkbox` | `value`               | 初始勾选状态                             |
+| `Radio`    | `choices`             | 单选选项列表                             |
+| `File`     | `file_types`          | 可选上传类型                             |
+| `Image`    | `type`                | 输出或输入类型 `pil`, `numpy`, `filepath` |
+|            | `tool`                | 编辑工具，如 `editor`、`sketch` 等         |
+
+---
+
+## 3️⃣ 输出类组件及特有属性
+
+| 组件          | 特有属性              | 说明                                  |
+| ----------- | ----------------- | ----------------------------------- |
+| `Label`     | `num_top_classes` | 显示前 N 个概率最高的分类                      |
+| `Image`     | `type`            | `pil`, `numpy`, `filepath`          |
+| `JSON`      | 无特有参数             | 显示 JSON 对象                          |
+| `Dataframe` | `headers`         | 列名                                  |
+| `Chatbot`   | `type`            | `"messages"` 或 `"blocks"`（显示聊天内容格式） |
+|             | `label`           | 上方标题                                |
+|             | `height`          | 高度，可选                               |
+
+---
+
+## 4️⃣ 布局组件及特有属性
+
+| 组件               | 特有属性                         | 说明                      |
+| ---------------- | ---------------------------- | ----------------------- |
+| `Blocks`         | `title`                      | 浏览器标签标题                 |
+|                  | `theme`                      | 主题，如 `gr.themes.Soft()` |
+|                  | `fill_width` / `fill_height` | 是否撑满窗口                  |
+| `Row` / `Column` | 无特有参数                        | 用于水平/垂直布局               |
+| `Tabs`           | `tab_name`                   | 标签页名称                   |
+| `Accordion`      | `open`                       | 是否默认展开                  |
+
+
 2.常用基础组件：
 描述组件：
     Title： “标题”
@@ -78,7 +137,7 @@ plot展示组件：
         a1=gr.Textbox(label="标签")   文本框
         a2=gr.Button("按钮名字")       按钮
         a2.click(                    按钮绑定事件
-            fn=
+            fn= 函数名
             intput=
             output=
         )
@@ -119,6 +178,7 @@ plot展示组件：
 
         fill_height/fill_width:值为布尔值，True控制（blocks）内的组件高度/宽度占满整个block
 
+        theme:样式 可以采用gradio默认的样式，theme = gr.theme.Soft()
     4.事件
         click：绑定一个组件，组件被点击后触发事件。
                 接三个参数（fn，int组件，put组件），在blocks中事件可以随意匹配三个参数。
@@ -147,8 +207,29 @@ plot展示组件：
             int.change(a,int,put)
 
             就会出现点击两次int单选框，就会出现put组件消失。
+5.launch函数
+    1.常用参数
+    参数	说明	示例
+    server_name	指定绑定的地址，默认 '127.0.0.1'	server_name="0.0.0.0"（允许局域网访问）
+    server_port	指定端口，默认 7860	server_port=8080
+    share	是否生成公网临时访问链接（Gradio 提供）	share=True
+    debug	启用调试模式，打印更多信息	debug=True
+    inbrowser	启动后是否自动打开浏览器	inbrowser=True
+    auth	访问验证，用户名密码	auth=("user","123")
+    ssl_keyfile / ssl_certfile	HTTPS 使用	ssl_keyfile="key.pem", ssl_certfile="cert.pem"
+    prevent_thread_lock	用于与多线程或 notebook 兼容	prevent_thread_lock=True
+    2.访问
+    2.1 本地访问
+    demo.launch(server_name="127.0.0.1", server_port=7860, inbrowser=True)
 
+    2.2 局域网访问
+    demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
 
+    2.3 公网临时链接（Gradio 提供）
+    demo.launch(share=True)
+
+    2.4 带用户名密码
+    demo.launch(auth=("admin", "123456"))
 
 
 
