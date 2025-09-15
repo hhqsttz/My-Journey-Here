@@ -62,9 +62,43 @@ python -m vllm.entrypoints.openai.api_server \
   --enable-auto-tool-choice \
   --tool-call-parser hermes
 三.项目创建
-1.多模态ai智能助手
+多模态ai智能助手
  大模型实例创建模块
  .env来存大模型的api_key和base_url通过env_test.py将env导入到设置的变量中，llm_model.py来创建llm
+
+rag流程
+1.a上下文感知检索器（大模型，上下文处理提示词，基于向量数据库的检索器）
+对话历史信息：
+短期，内存或者缓存
+长期，rides数据库
+通过大模型将用户问题与历史信息进行整合，返回一个更饱满的问题，通过检索器，词嵌入。
+2.向量数据库
+来自本地或者官方文档：
+通过爬虫，下载下来，在通过切割器切割出一个个documents，存入到向量数据库。
+3.将问题与向量数据库进行查询，将最终返回结果给到大模型，生成最终答案。
+b文档处理链（给定检索出来的上下文和向量数据库中的相近的document做成的提示词，大模型）
+检索链（a,b）
+
+向量数据库
+1.导包分cpu和gpu
+2.创建向量数据库实例
+FISS(需要emb模型，数据索引检索方式比如余弦相似度，存储docs对象（）)
+3.实例方法
+1.存入docs对象，包括id和doc（元数据和包文本）
+2.删除docstore
+实例.delete（ids=[id]）
+3.查询
+相似度查询
+similarity_search（内容，top）->返回的是docstore对象
+带分数的查询
+similarity_search_with_score（内容，top）->返回的是(docstore对象,score)
+过滤查询
+similarity_search_with_score（内容，top，过滤字段filter={"source"="元数据"}）->
+返回的是(docstore对象,score)
+3.以文件夹保存本地
+4.FISS.load_local(文件地址，模型，是否可修改)下载到本地
+
+
 
 模块函数介绍
 
