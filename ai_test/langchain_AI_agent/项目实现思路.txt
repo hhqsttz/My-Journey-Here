@@ -25,7 +25,7 @@ from （huggingface_hub/modelscope） import snapshot_download
 # ==== 配置区域 ====
 # Hugging Face 模型仓库 ID (在模型页面 URL 可以找到)
 repo_id = "Qwen/Qwen2.5-Omni-3B"
-# 模型下载保存目录 (可以换成自己的路径)
+# 模型下载保存目录 (在环境变量设置huggingface缓存目录HF_HOME)
 cache_dir = "/root/autodl-tmp/models"
 # 指定版本 (huggingface是 "main"，modelscope是"master")
 revision = "main"/"master"
