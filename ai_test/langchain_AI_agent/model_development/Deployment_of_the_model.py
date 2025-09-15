@@ -1,8 +1,8 @@
 
-from modelscope import snapshot_download
-from sentence_transformers import SentenceTransformer
-
-from huggingface_hub import snapshot_download
+# from modelscope import snapshot_download
+# from sentence_transformers import SentenceTransformer
+#
+# from huggingface_hub import snapshot_download
 #
 # #1.下载huggingface依赖包 pip install -U huggingface_hub
 # #2.配置国内镜像网站  HF_ENDPOINT = https://hf_mirror.com

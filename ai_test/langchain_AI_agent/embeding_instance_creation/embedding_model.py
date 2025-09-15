@@ -1,8 +1,8 @@
-from openai import OpenAI
-from langchain_openai import OpenAIEmbeddings
-from langchain_huggingface import HuggingFaceEmbeddings
-from env_test import OPENAI_BASE_URL, OPENAI_API_KEY, BASE_URL, BASE_API_KEY
-#openai官方版本
+# from openai import OpenAI
+# from langchain_openai import OpenAIEmbeddings
+# from langchain_huggingface import HuggingFaceEmbeddings
+# from env_test import OPENAI_BASE_URL, OPENAI_API_KEY, BASE_URL, BASE_API_KEY
+# openai官方版本
 # clint = OpenAI(
 #     base_url=BASE_URL,
 #     api_key=BASE_API_KEY,
@@ -16,10 +16,10 @@ from env_test import OPENAI_BASE_URL, OPENAI_API_KEY, BASE_URL, BASE_API_KEY
 #
 # print(a.data[0].embedding)
 # print(len(a.data[0].embedding))
-
-
-
-#langchain集成openai版本
+#
+#
+#
+# langchain集成openai版本
 # emb= OpenAIEmbeddings(
 #     base_url=OPENAI_BASE_URL,
 #     api_key=OPENAI_API_KEY,
@@ -43,9 +43,9 @@ from env_test import OPENAI_BASE_URL, OPENAI_API_KEY, BASE_URL, BASE_API_KEY
 # print(a1[0]) #打印文档1的向量
 # print(a1[1]) #打印文档2的向量
 # print(len(a1[1])) #打印文档2的向量维度大小
-
-#langchain集成huggingface的版本
-
+#
+# langchain集成huggingface的版本
+#
 # model_name = "sentence-transformers/all-mpnet-base-v2"
 # model_kwargs = {'device': 'cpu/cuda'}           #使用Cpu/Gpu 计算
 # encode_kwargs = {'normalize_embeddings': True}  #是否归一化

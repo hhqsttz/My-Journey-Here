@@ -14,7 +14,7 @@ def get_embedding_model():
     global model
 
     # 如果模型已经加载，直接返回
-    if model is not None:
+    if m1 is not None:
         return model
 
     # 延迟导入 - PyCharm不会在打开文件时就分析这些库
@@ -39,10 +39,10 @@ def text_processing(source_file,output_file):
     df = df[["z1","z2"]]
     df = df.dropna()
     df['text'] = "z1:"+df.z1.str.strip()+"z2:"+df.z2.str.strip()
-    m1 = get_embedding_model()
+    m1=get_embedding_model()
     #向量化文件
     #1.少量
-    # df["embeddings"] = model.embed_documents(df.text.tolist())
+    # df["embeddings"] = m1.embed_documents(df.text.tolist())
     #2.少量多次
     batch_size = 32
     embeddings = []
@@ -64,9 +64,8 @@ def cosine_distance(a,b):
 def cosine_distance1(a,b):
     #使用归一化的方式 encode_kwargs = {'normalize_embeddings': True}
     return  np.dot(a, b)
-def search_file(input,file,top=3):
-    m1 = get_embedding_model()
-    a = m1.embed_documents([input])[0]
+def search_file(intput,file,top=3):
+    a = m1.embed_documents([intput])[0]
     df = pd.read_csv(file)
     df["embeddings_vector"]=df["embeddings"].apply(ast.literal_eval)
     df["cosine_distance"] = df.embeddings_vector.apply(lambda x : cosine_distance1(a,x))

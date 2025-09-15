@@ -1,0 +1,87 @@
+langgraph项目流程
+1.创建新的虚拟环境
+2.pip install "langgraph-cli[inmem]"
+3.在指定目录langgraph new 项目名字
+4.重置.env.example文件为.env的空文件
+5.安装当前项目的依赖
+    pip install -e .
+6.在根目录完善好你的agent的代码
+    1.上下文记忆，短期记忆与长期记忆（最佳搭配的后端redis和Postgresql）
+    2.关于工具：
+        工具的创建四种：
+            1.函数（用的最多）
+            2.继承于BaseTool
+            3.StructuredTool langchain的runnable对象
+            4.MCP Server（function calling）
+        工具描述风格最常用：
+            base_tool_Goggle.py
+        #一个工具包含(名称，描述，args_schem),描述的越清晰工具执行的效果越好。
+        如果本地调用智能体，随便在哪invoke就行，如果要部署到langgraph服务器上，
+        就要把工具以及其他东西加载到根目录的agent包当中。
+    3.将工具与llm整合测试
+      流式输出时最终回复时是流式输出，其他的都是整条信息
+      在agent进行流式输出时，llm会通过工具调用解析器（--tool--call--paser）来向tool进行传参。
+      但是由于各推理框架的pytorch的版本不同，qw3的工具调用解析器使用自己的qw25，只能退而求其次选择herms，
+      但是还会出错，所以需要用sglang等框架部署。
+        pip install "sglang[all]>=0.4.6.post1"
+        # 启动大模型服务
+        python -m sglang.launch_server \
+          --model-path /hy-tmp/models/Qwen/Qwen3-8B \
+          --served-model-name qwen3-8b \
+          --context-length 8192 \
+          --trust-remote-code \
+          --host 0.0.0.0 \
+          --port 8080 \
+          --reasoning-parser qwen3 \
+          --tool-call-parser qwen25
+
+
+
+7.基于本地开启一个本地的服务
+    命令行langgraph dev
+8.用stdio来测试你的agent
+
+9.本地python调用api服务接口
+    在tests文件夹创建测试.py
+    包括同步异步调用
+    langgraph流式输出，
+    配置stream-model="messages-tuple ",输出的数据格式
+----------------------------------------------------------------
+同步调用
+from langgraph_sdk import get_sync_client
+
+client = get_sync_client(url="http://localhost:2024") #Rustfulapi接口
+
+for chunk in client.runs.stream(
+    None,  # Threadless run 是否启用一个线程
+    "agent", # Name of assistant. Defined in langgraph.json.
+    input={"messages": [{"role": "human","content": "What is LangGraph?",}],},
+    stream_mode="messages-tuple", #消息一个一个token流式输出
+):
+
+    print(f"Receiving new event of type: {chunk.event}...")
+    print(chunk.data)
+    print("\n\n")
+---------------------------------------------------------
+异步调用  （返回一个字典“metadate”：id号，“message"：{4条消息，人类，aiF，tool，ai}）
+from langgraph_sdk import get_client
+import asyncio
+
+client = get_client(url="http://localhost:2024")
+
+async def main():
+    async for chunk in client.runs.stream(
+        None,  # Threadless run
+        "agent", # Name of assistant. Defined in langgraph.json.
+        input={
+        "messages": [{
+            "role": "human",
+            "content": "What is LangGraph?",
+            }],
+        },
+    ):
+        print(f"Receiving new event of type: {chunk.event}...")
+        print(chunk.data)
+        print("\n\n")
+
+asyncio.run(main())
