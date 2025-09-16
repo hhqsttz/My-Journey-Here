@@ -7,6 +7,93 @@ langgraph项目流程
     pip install -e .
 6.在根目录完善好你的agent的代码
     1.上下文记忆，短期记忆与长期记忆（最佳搭配的后端redis和Postgresql）
+                            graph = create_react_agent(
+                            llm,
+                            tools=[get_weather],
+                            prompt = prompt     #动态设定提示词
+                            checkpointer=checkpointer
+                            state_schem = CustomerState
+                        )
+
+        config:
+            记忆类型	Configurable 参数	作用域	主要用途	底层机制
+            短期记忆	"thread_id"	单次对话线程	维持当前对话的上下文和状态	Checkpointer
+            长期记忆	"user_id"	跨所有对话会话	标识用户，存储其跨会话的持久化信息	Store (命名空间)
+
+            1.可以设置一个动态prompt（callable对象，就是一个函数），在测试调用的时候传一个，config参数
+            2.通过tool来获得具体实现都是通过函数
+                eg:
+                def prompt (config:RunnableConfig,state:AgentState) ->List[AnyMessage]:
+                            user_name = config["configurable"].get("user_name","zs")
+
+                            s_message = f"系统提示词，{user_name}"
+
+                            return [{"role":"system","content":s_message}]+state["messages"]
+        Agentstate：
+            定义：存放状态消息，判断是否为最后一条消息等。
+            自定义一个状态类继承（Agentstate），可以在里面新加变量,可以通过修改工具输出结果来改变自定义状态变量。
+                eg：
+                    要先定义一个state类才能进行下面的修改：
+                    class CustomerState(AgentState):
+                        user_id :str
+                    @tool
+                    def a(config:RunnableConfig,
+                          tool_call_id:Annotated[str,InjectedToolCallid]  #设置自动注入上一条信息输出的ToolCallid
+                         )->Command:                                     #输出内容为一个Command声明
+                        user_id=config["configurable"]["user_id"],
+                        return Command(
+                        update={user_id=user_id,
+                        messages={ToolMessage(content="拿到用户的信息了",
+                                  tool_call_id=tool_call_id)}}
+                        )
+                    @tool
+                    def geet(state:Annotated[CustomerState,InjectedState]) #自动注入当前的state
+                        user_id = state.user_id
+                        return f"祝贺你{user_id}"
+        短期记忆checkpointer:
+                获得短期记忆内容：list(agent.get_state(config))
+                # 内存： 开发环境
+                checkpointer = InMemorySaver()
+
+                # 在生产环境中，使用由数据库支持的检查点
+                # 必须安装：pip install -U "psycopg[binary,pool]" langgraph-checkpoint-postgres
+                DB_URI = "postgresql://postgres:postgres@localhost:5432/数据库名字"
+                with PostgresSaver.from_conn_string(DB_URI) as checkpointer:
+                        checkpointer.setup()    #第一次创建需要执行后面就不需要了
+                     ***这个数据库必须要存在，如何创建数据库
+                        psql -U 用户名 #命令行输入，进入到数据库当中，密码输好直接回车就行
+                        create database 数据库名字
+
+                # 生产环境：Redis
+                # pip install -U langgraph-checkpoint-redis
+                DB_URI = "redis://:6379"
+                with RedisSaver.from_conn_string(DB_URI) as checkpointer:
+                       checkpointer.setup()    #第一次创建需要执行后面就不需要了
+
+        长期记忆store：
+                获得长期记忆内容：list(agent.get_state_history(config))
+                # 开发环境中： 内存
+                store = InMemoryStore()
+
+                # 在生产环境中，使用由数据库支持的存储
+                DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable"
+                with (
+                    PostgresStore.from_conn_string(DB_URI) as store,
+                    PostgresSaver.from_conn_string(DB_URI) as checkpointer,
+                ):
+                    # store.setup()
+                    # checkpointer.setup()
+
+
+
+                DB_URI = "redis://:6379"
+                with (
+                    RedisStore.from_conn_string(DB_URI) as store,
+                    RedisSaver.from_conn_string(DB_URI) as checkpointer,
+                ):
+                    store.setup()
+                    checkpointer.setup()
+
     2.关于工具：
         工具的创建四种：
             1.函数（用的最多）
@@ -18,6 +105,48 @@ langgraph项目流程
         #一个工具包含(名称，描述，args_schem),描述的越清晰工具执行的效果越好。
         如果本地调用智能体，随便在哪invoke就行，如果要部署到langgraph服务器上，
         就要把工具以及其他东西加载到根目录的agent包当中。
+    关于MCP
+    🛠️ MCP 的核心作用
+    MCP (Model Context Protocol) 是一个由 Anthropic 推出的开源协议，它旨在标准化应用程序向语言模型（LLM）提供工具和上下文的方式。
+    简单来说，它就像一套“驱动标准”，允许外部数据源和工具通过统一的“接口”被 LLM 发现和调用，从而丰富智能体的能力，使其不再局限于模型自身的知识和功能。
+
+    📡 MCP 的通信机制
+    你提到的三种通信机制是正确的：
+    stdio (标准输入输出)：常用于本地进程间通信，例如在桌面客户端（如 Claude Desktop）中集成本地工具。
+    SSE (Server-Sent Events)：一种 HTTP 协议，允许服务器向客户端推送数据，适用于需要实时更新的 Web 应用场景。
+    streamable_http：Streamable HTTP 是 MCP 协议中一种更灵活高效的通信方式，它通过单一端点支持双向通信和按需流式传输，解决了传统 SSE 方式的断线重连和兼容性问题。
+
+
+    🐍 开发 MCP 服务器的工具
+    你的理解是对的，可以使用不同的工具或框架来开发 MCP 服务器，以适应不同的技术栈：
+
+    Python: FastMCP 是一个不错的选择，它旨在简化构建 MCP 服务器的流程，让开发者可以快速构建符合 MCP 协议的服务器，将业务逻辑、数据资源、安全传输统一暴露给 LLM。
+    创建流程：
+        1.创建FastMCP实例  tools_server.py/tools_server2.py
+            导入fastMCP这个包，创建实例，基于实例创建工具，提示词模板，资源获取
+        2.基于不同的通信机制运行实例 start_sse_server.py/start_streamable_server.py
+
+    Java/Spring 生态: Spring AI 提供了对 MCP 客户端的支持（例如 spring-ai-mcp-client-spring-boot-starter），
+    使得 Spring Boot 应用程序能够方便地连接和调用 MCP 服务器提供的工具。
+    虽然搜索结果更多提及的是 Spring AI 作为 MCP Client 去连接其他 MCP Server，但理论上也可以用于构建 MCP Server。
+
+    其他外网工具: 是的，互联网上有许多现成的、针对特定服务的 MCP 服务器，例如 Brave Search MCP 服务器、文件系统 MCP 服务器等。你可以直接连接并使用这些现成的工具。
+
+    MCP的安全认证
+    这个是服务端要做的，是用来验证用户访问权限的。
+    具体流程：首先，有三个立场，签发方，服务方，用户方。签发方会生成一对钥匙对，包括公钥和私钥，公钥给服务方，私钥自己保存。
+                服务方会接着配置规则，包括这个公钥，签发方与服务方的标识。
+                签发方会基于私钥以及你的信息（你是谁，你访问的权限），以及签发方服务方的标识来生成一个签名，
+                用户方，如果要访问服务，就要拿到这个签名，并且给服务方展示，校验过后就可以用到服务方的服务了。
+
+    🔌 LangGraph 与 MCP 的集成
+    LangGraph 本身是一个用于构建状态化、多智能体应用程序的框架。要让 LangGraph 中运行的智能体能够发现和调用这些由 MCP 服务器提供的工具，就需要一个“适配器”或“桥接”库。
+    你提到的 langgraph-mcp-adapters 之类的库（搜索结果中提到了 langchain-mcp-adapters）正是起到了这个作用。
+    它能够动态地从 MCP 服务器获取工具列表（通常以 JSON Schema 描述），并将其转换为 LangChain/LangGraph 智能体能够识别和调用的工具格式（例如 LangChain 的 BaseTool）。
+    这意味着你无需在代码中硬编码所有工具的定义，智能体可以在运行时自动发现已连接的 MCP 服务器提供了哪些工具，并动态调用它们。这大大增强了智能体的灵活性和可扩展性。
+    使用流程：mcp_agent.py/mcp_agent2.py
+        1.创建mcp服务端实例
+        2.异步地获取工具，提示词，资源
     3.将工具与llm整合测试
       流式输出时最终回复时是流式输出，其他的都是整条信息
       在agent进行流式输出时，llm会通过工具调用解析器（--tool--call--paser）来向tool进行传参。
@@ -60,8 +189,9 @@ for chunk in client.runs.stream(
 ):
 
     print(f"Receiving new event of type: {chunk.event}...")
-    print(chunk.data)
-    print("\n\n")
+    print(chunk.data)                     #这个打印的结果就是
+    print("\n\n")                         #首先一个HumanMessage，一个AIMessage（主要是工具调用的指令），ToolMessage，AIMessage
+                                           并且输出的主要是Message的content
 ---------------------------------------------------------
 异步调用  （返回一个字典“metadate”：id号，“message"：{4条消息，人类，aiF，tool，ai}）
 from langgraph_sdk import get_client
