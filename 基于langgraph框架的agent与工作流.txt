@@ -91,5 +91,14 @@ node：核心任务就是更新完成任务的state，常接state和config两个
 edge：用来控制一个节点该去往哪个节点
         分为普通边和条件选择边，条件选择边可以根据一个函数的返回结果来判断去向，如果有字典映射，就可以在Studio UI中显示
 
+Toolnode工具调用：
+1.官方Toolnode类，代码简便
+2.自定义
 
-    
+人工审查：
+一.使用Toolnode式工具调用：
+  1.部署在langgraph服务器上的情况，直接在创建图的时候加一个参数就行 graph = builder.compile(interrupt_before=['node名字'])，
+  可以在studioUI测试，设置interrupt_before参数必须要设置记忆存储，服务器会默认创建短期与长期记忆。
+  2.graph4.py 这中只能将所有工具调用都暂停，不能特定安排
+二.自定义：
+  graph5.py
