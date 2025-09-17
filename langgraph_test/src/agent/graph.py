@@ -1,7 +1,7 @@
 from typing import List
 
 from anyio.lowlevel import checkpoint
-from langchain_core.messages import SystemMessage, AnyMessage
+from langchain_core.messages import SystemMessage, AnyMessage, AIMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
 from langgraph.graph import message
