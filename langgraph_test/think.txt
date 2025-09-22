@@ -29,7 +29,7 @@ langgraph项目流程
                             s_message = f"系统提示词，{user_name}"
 
                             return [{"role":"system","content":s_message}]+state["messages"]
-        Agentstate：
+        Angentstate：
             定义：存放状态消息，判断是否为最后一条消息等。
             自定义一个状态类继承（Agentstate），可以在里面新加变量,可以通过修改工具输出结果来改变自定义状态变量。
                 eg：
